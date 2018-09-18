@@ -6,7 +6,7 @@ The following courses need to be completed in preparation for this project:
 
 ## Schedule and Deadlines
 ### Machine Learning, Andrew NG  
-Python Assignments - https://github.com/dibgerge/ml-coursera-python-assignments/blob/master/README.md
+The python version for the assignments can be found [here](https://github.com/dibgerge/ml-coursera-python-assignments/blob/master/README.md).
 
 | Week # 	| Assignment Name                                	| Deadlines  	|
 |--------	|------------------------------------------------	|------------	|
