@@ -32,4 +32,4 @@ Python Assignments - https://github.com/dibgerge/ml-coursera-python-assignments/
         - References, what website/blog/article (if any), apart from what's given to you in the course, to learn/complete the assignment. 
 2. Your submission must be present under `course_name/week-x/your_name/assignment_name.ipynb`.  
 The wiki article should have the name `Your Name | Course Name | Week #`. Mintain uniformity while giving these names. Check out the sample wiki page [here](https://github.com/IEEE-NITK/open-qas/wiki/Guru-%7C-Machine-Learning-%7C-Week-1).
-3. Every submission should be a pull request to the main repository. Assign @gurupunskill and @anumehaagarwal to review the request.
+3. Every submission should be a pull request to the main repository. Assign @gurupunskill and @anumehaagrawal to review the request.
