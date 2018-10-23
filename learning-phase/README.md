@@ -20,9 +20,9 @@ The python version for the assignments can be found [here](https://github.com/di
 
 | Week # 	| Assignment Name                                	| Deadlines  	|
 |--------	|------------------------------------------------	|------------	|
-| Week 1 	| RNN                                            	| October 19 	|
-| Week 2 	| Logistic Regression                            	| October 22 	|
-| Week 3 	| Multi-class Classification and Neural Networks 	| October 26 	|
+| Week 1 	| RNNs and LSTMs                                    | October 19 	|
+| Week 2 	| Word Embeddings                            	    | October 22 	|
+| Week 3 	| Seq2Seq and Attention based models             	| October 26 	|
 
 ## Instructions
 1. Every submission must have two components:
