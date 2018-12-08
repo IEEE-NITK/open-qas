@@ -5,7 +5,6 @@ This folder will hold **small, temporary datasets** that we can use to test the 
  * [`1000-wiki-edu.xml`](1000-wiki-edu.xml) holds 1000 education articles in an xml with wikipedia's dump formatting.
  * [`1000-wiki-edu-parsed.json`](1000-wiki-edu-parsed.json) holds the parsed json of the above xml.
  
-
 ## Instructions to Create a new Dataset
  1. Use [PetScan](https://petscan.wmflabs.org/) to get a list of article names for a category. Use the `depth` parameter to tweak the subcategories. Save it in a csv file (or anything else) by changing the output type under the output tab.
  2. Use [Wikipedia Special Export](https://en.wikipedia.org/wiki/Special:Export) to get the xml file with the article content.
