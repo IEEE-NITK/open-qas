@@ -3,6 +3,10 @@ import numpy as np
 import sklearn as sk
 from sklearn.feature_extraction.text import HashingVectorizer
 from sklearn.feature_extraction.text import TfidfTransformer
+import prettytable
+import code
+import argparse
+import os.path
 
 # Array of stopwords that I gracefully borrowed from the DrQA implementation
 STOPWORDS = {
@@ -48,8 +52,9 @@ class Retriever:
         """ Returns an array of the indices of the k best documents.
             If return_scores=True, then also returns the respective scores 
             for every index.
+            query must be a list of strings
         """
-        assert self.tfidf_matrix != None
+        assert self.tfidf_matrix is not None
 
         query_count = self.h_vectorizer.transform(query)
         query_tfidf = self.transformer.transform(query_count)
@@ -75,4 +80,69 @@ class WikiRetriever:
         Modifications required before use with the actual dataset
         Pretty prints titles along with their scores.
     """
+
+    def __init__(self, path):
+        """ Initialises the WikiRetriever.
+            Expects the path to the scam JSON file as input.
+        """
+        self.path = path
+
+        # Load the JSON. Docs are stored in a Pandas Dataframe
+        self.wikidocs = pd.read_json(path, lines=True)
+        assert self.wikidocs is not None
+        self.retriever = None
+
+    def fit(self, ngrams=2):
+        """ Creates the retriever and builds the tfidf matrix
+            Returns nothing. 
+        """
+        self.retriever = Retriever(ngrams)
+        self.retriever.build_tfidf(self.wikidocs.text)
+
+    def find_best_docs(self, query, k=10):
+        """ Returns the titles and scores of the k closest docs 
+            query must be a list of strings
+        """
+
+        best_docs_indices, best_docs_scores = self.retriever.find_best_doc_indices(query, k, return_scores=True)
+        return best_docs_indices, self.wikidocs.title[best_docs_indices], best_docs_scores
+
+def main():
+    """ This main function creates an interactive shell for the retriever.
+        Heavily inspired by the DrQA implementation.
+    """
+    parser = argparse.ArgumentParser()
+    parser.add_argument("path", type=str, help="path to scam JSON holding Wiki data")
+    args = parser.parse_args()
+
+    assert os.path.isfile(args.path)
+    ranker = WikiRetriever(args.path)
+    ranker.fit()
+
+    def where_is(query, k=10):
+        doc_indices, doc_titles, doc_scores = ranker.find_best_docs([query], k)
+        ptable = prettytable.PrettyTable(
+            ['Rank', 'Document', 'Score']
+        )
+        for i in range(len(doc_indices)):
+            ptable.add_row([i+1, doc_titles[doc_indices[i]], '%.5g' % doc_scores[i]])
+        
+        print(ptable)
+
+    banner = """
+    Interactive Wiki Retriever
+    >>> where_is(question, k=10)
+    >>> pls()
+    """
+
+    exitmsg = """
+    Exiting Interactive Wiki Retriever
+    """
+
+    def pls():
+        print(banner)
     
+    code.interact(banner=banner, local=locals(), exitmsg=exitmsg)
+
+if __name__ == "__main__":
+    main()
