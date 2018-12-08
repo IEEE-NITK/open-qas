@@ -8,6 +8,6 @@ This folder will hold **small, temporary datasets** that we can use to test the 
 
 ## Instructions to Create a new Dataset
  1. Use [PetScan](https://petscan.wmflabs.org/) to get a list of article names for a category. Use the `depth` parameter to tweak the subcategories. Save it in a csv file (or anything else) by changing the output type under the output tab.
- 2. Use [Wikipedia Speacial Export](https://en.wikipedia.org/wiki/Special:Export) to get the xml file with the article content.
+ 2. Use [Wikipedia Special Export](https://en.wikipedia.org/wiki/Special:Export) to get the xml file with the article content.
  3. Use [WikiExtractor](https://github.com/attardi/wikiextractor) to extract the titles and the article content from the xml file.  
  4. Push the file with the format `number_of_articles-wiki-category`. So `1000-wiki-edu` would hold roughly 1000 education articles.
