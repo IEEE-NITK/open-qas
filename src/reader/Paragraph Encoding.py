@@ -11,8 +11,10 @@ import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.tag import pos_tag
 
+#Download this particular file from kaggle
 glove_data_file ='glove.6B.100d.txt'
 
+#Load pretrained word embeddings
 def loadGloveModel(gloveFile,words):   
     f = open(gloveFile,'r')
     model = {}
@@ -24,7 +26,7 @@ def loadGloveModel(gloveFile,words):
             model[word] = embedding
     return model
 
-
+#Data cleaning and tokenising 
 def cleaned_words(sentance):
     words = re.split(r'\W+', sentance)
     table = str.maketrans('', '', string.punctuation)
@@ -36,12 +38,13 @@ def cleaned_words(sentance):
     return final_words
 
 
+#Calculating parts of speech of words in a text
 def pos_tagging_list(sent):
     sent = nltk.word_tokenize(sent)
     sent = nltk.pos_tag(sent)
     return sent
 
-
+#Calculating name entity recognition of words in text
 def ner(doc):
     tokenized_doc = nltk.word_tokenize(doc)
     tagged_s = nltk.pos_tag(tokenized_doc)
@@ -55,7 +58,7 @@ def ner(doc):
                 named_entities[entity_name]=entity_type
     return named_entities
 
-
+#Finding lemmas of a word and checking if the word of para has a lemma in the question
 def get_word_synonyms_from_sent(word, sent):
     word_synonyms = []
     for synset in wordnet.synsets(word):
@@ -64,7 +67,7 @@ def get_word_synonyms_from_sent(word, sent):
                 word_synonyms.append(lemma)
     return word_synonyms
 
-
+#Calculating term frequency of a word (TF)
 def term_frequency(words):
     word_counts = {}
     for word in words:
@@ -76,7 +79,7 @@ def term_frequency(words):
         word_counts[key]= value/len(words)
     return word_counts
 
-
+#Checking if a word and question word are exact matches
 def exact_match(word,question):
     ans = []
     synonym = get_word_synonyms_from_sent(word,question) 
@@ -96,6 +99,7 @@ def exact_match(word,question):
         ans.append(0)
     return ans
 
+#Calculating similarity between a word and glove words
 def similarity(word,model_words):
     most_sim_count =0
     most_sim_word = word
@@ -103,7 +107,8 @@ def similarity(word,model_words):
         if fuzz.ratio(word,test_words)>most_sim_count :
              most_sim_word = test_words
     return most_sim_word
-        
+
+#main function which performs paragraph encoding
 def paragraph_encoding(paragraph,question):
     para_vector=[]
     tokens = cleaned_words(paragraph)
