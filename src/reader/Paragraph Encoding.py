@@ -1,23 +1,15 @@
 
-# coding: utf-8
-
-# In[118]:
-
-
 from nltk.corpus import wordnet
 from fuzzywuzzy import fuzz, StringMatcher
 import csv
 import nltk
 import re
 import string
+import pandas as pd
 import zipfile
 import numpy as np
 from nltk.tokenize import word_tokenize
 from nltk.tag import pos_tag
-
-
-# In[106]:
-
 
 glove_data_file ='glove.6B.100d.txt'
 
@@ -33,9 +25,6 @@ def loadGloveModel(gloveFile,words):
     return model
 
 
-# In[107]:
-
-
 def cleaned_words(sentance):
     words = re.split(r'\W+', sentance)
     table = str.maketrans('', '', string.punctuation)
@@ -47,16 +36,10 @@ def cleaned_words(sentance):
     return final_words
 
 
-# In[108]:
-
-
 def pos_tagging_list(sent):
     sent = nltk.word_tokenize(sent)
     sent = nltk.pos_tag(sent)
     return sent
-
-
-# In[109]:
 
 
 def ner(doc):
@@ -73,9 +56,6 @@ def ner(doc):
     return named_entities
 
 
-# In[110]:
-
-
 def get_word_synonyms_from_sent(word, sent):
     word_synonyms = []
     for synset in wordnet.synsets(word):
@@ -83,9 +63,6 @@ def get_word_synonyms_from_sent(word, sent):
             if lemma in sent and lemma != word:
                 word_synonyms.append(lemma)
     return word_synonyms
-
-
-# In[111]:
 
 
 def term_frequency(words):
@@ -98,9 +75,6 @@ def term_frequency(words):
     for key,value in word_counts.items():
         word_counts[key]= value/len(words)
     return word_counts
-
-
-# In[112]:
 
 
 def exact_match(word,question):
@@ -122,10 +96,6 @@ def exact_match(word,question):
         ans.append(0)
     return ans
 
-
-# In[119]:
-
-
 def similarity(word,model_words):
     most_sim_count =0
     most_sim_word = word
@@ -134,11 +104,6 @@ def similarity(word,model_words):
              most_sim_word = test_words
     return most_sim_word
         
-
-
-# In[120]:
-
-
 def paragraph_encoding(paragraph,question):
     para_vector=[]
     tokens = cleaned_words(paragraph)
@@ -171,21 +136,11 @@ def paragraph_encoding(paragraph,question):
             word_embedding.append('O')
         para_vector.append(word_embedding)
     return para_vector
-        
-        
-        
-
-
-# In[121]:
 
 
 para= "hello Andrew, i am very happy"
 q = "what is glad"
-paragraph_encoding(para,q)
+df = pd.DataFrame(paragraph_encoding(para,q))
 
-
-# In[ ]:
-
-
-
-
+df = pd.get_dummies(df) 
+# Pass the dataframe through RNN and obtain output vector
