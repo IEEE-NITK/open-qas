@@ -30,29 +30,33 @@ STOPWORDS = {
 }
 
 class Retriever:
-    """ Once fit, will return the k best documents for a query.
+    """
+    Once fit, will return the k best documents for a query.
     """
 
     def __init__(self, ngrams=2):
-        """ Initialises Retriever class. 
+        """
+        Initialises Retriever class. 
         """
         self.h_vectorizer = HashingVectorizer(ngram_range=(1,ngrams), strip_accents='unicode', stop_words=STOPWORDS)
         self.transformer = TfidfTransformer()
         self.tfidf_matrix = None
 
     def build_tfidf(self, docs):
-        """ Creates the tf-idf sparse matrix for the documents inputted.
-            Expects a list of strings as input.
-            Returns nothing.
+        """
+        Creates the tf-idf sparse matrix for the documents inputted.
+        Expects a list of strings as input.
+        Returns nothing.
         """
         h_doc_counts = self.h_vectorizer.transform(docs)
         self.tfidf_matrix = self.transformer.fit_transform(h_doc_counts)
 
     def find_best_doc_indices(self, query, k, return_scores=False):
-        """ Returns an array of the indices of the k best documents.
-            If return_scores=True, then also returns the respective scores 
-            for every index.
-            query must be a list of strings
+        """
+        Returns an array of the indices of the k best documents.
+        If return_scores=True, then also returns the respective scores 
+        for every index.
+        query must be a list of strings
         """
         assert self.tfidf_matrix is not None
 
@@ -75,15 +79,17 @@ class Retriever:
 
 
 class WikiRetriever:
-    """ Wrapper class for the actual Retriever.
-        Made for the scam JSON files we're using as our _dataset_
-        Modifications required before use with the actual dataset
-        Pretty prints titles along with their scores.
+    """
+    Wrapper class for the actual Retriever.
+    Made for the scam JSON files we're using as our _dataset_
+    Modifications required before use with the actual dataset
+    Pretty prints titles along with their scores.
     """
 
     def __init__(self, path):
-        """ Initialises the WikiRetriever.
-            Expects the path to the scam JSON file as input.
+        """
+        Initialises the WikiRetriever.
+        Expects the path to the scam JSON file as input.
         """
         self.path = path
 
@@ -93,23 +99,26 @@ class WikiRetriever:
         self.retriever = None
 
     def fit(self, ngrams=2):
-        """ Creates the retriever and builds the tfidf matrix
-            Returns nothing. 
+        """
+        Creates the retriever and builds the tfidf matrix
+        Returns nothing. 
         """
         self.retriever = Retriever(ngrams)
         self.retriever.build_tfidf(self.wikidocs.text)
 
     def find_best_docs(self, query, k=10):
-        """ Returns the titles and scores of the k closest docs 
-            query must be a list of strings
+        """
+        Returns the titles and scores of the k closest docs 
+        query must be a list of strings
         """
 
         best_docs_indices, best_docs_scores = self.retriever.find_best_doc_indices(query, k, return_scores=True)
         return best_docs_indices, self.wikidocs.title[best_docs_indices], best_docs_scores
 
 def main():
-    """ This main function creates an interactive shell for the retriever.
-        Heavily inspired by the DrQA implementation.
+    """
+    This main function creates an interactive shell for the retriever.
+    Heavily inspired by the DrQA implementation.
     """
     parser = argparse.ArgumentParser()
     parser.add_argument("path", type=str, help="path to scam JSON holding Wiki data")
