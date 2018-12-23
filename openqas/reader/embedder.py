@@ -128,20 +128,3 @@ class Embedder:
         
         list_of_matrices = np.array(list_of_matrices)
         return list_of_matrices
-    
-def main():
-    glove_embeddings = WordEmbeddings()
-    glove_embeddings.load_glove("../../data/glove.6B.100d.txt")
-    embedder = Embedder(glove_embeddings, seq_length=10)
-    docs = ["My name is guru", "I love Guru's food"]
-
-    tokens, sequences = embedder.tokenize(docs)
-    print(tokens)
-    print(sequences)
-    vals = embedder.get_embeddings(docs)
-    print(vals)
-    print(vals.shape)
-
-
-if __name__ == "__main__":
-    main()
