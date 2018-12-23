@@ -6,7 +6,7 @@ from fuzzywuzzy import fuzz, StringMatcher
 
 class WordEmbeddings:
     """
-    Class to load and handle the GloVe Word Embeddings
+    Module to load and handle the GloVe Word Embeddings
     """
 
     def __init__(self):
