@@ -1,0 +1,4 @@
+all = [
+    'embedder',
+    'reader'
+]
