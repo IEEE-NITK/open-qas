@@ -53,7 +53,7 @@ def EmbeddingLayer(word_to_vec, word_to_index):
     return embedded_layer
 
 def Encode(word_to_vec, word_to_index):
-    input = Input((50, ), dtype='int32')
+    input = Input((50, ))
     
     embedding_layer = EmbeddingLayer(word_to_vec, word_to_index)
     embeddings = embedding_layer(input)
