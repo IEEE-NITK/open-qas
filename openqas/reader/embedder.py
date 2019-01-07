@@ -13,7 +13,9 @@ from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 import pandas as pd
 import string
-#from ..utils.data import WordEmbeddings
+import sys
+sys.path.append("..")
+from utils.data import WordEmbeddings
 
 STOPWORDS = {
     'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your',
@@ -119,14 +121,27 @@ class Embedder:
 
         for sequence in sequences:
             matrix = np.zeros((seq_len, emb_dim + meha))
+            print(sequence)
+            sentence = [sequence[j] for j in range(0,seq_len)]
+            freqs = self.word_frequency(sentence)
+
             for i in range(0, seq_len):
                 index = sequence[i]
                 if index != 0:
                     word = self.embeddings.index_to_word[index]
                     vector = self.embeddings.word_to_vec[word]
+                    ### Feautures ###
+                    pos = self.OneHotEncode(POSTAGS, self.GetPOSTags(word)[1])
+                    word_freq = freqs[i]
+                    lemma = self.Lemmatize(word)
                     """
                     APPEND FEATURES TO VECTOR HERE
                     """
+                    vector.append(pos)
+                    vector.append(word_freq)
+                    vector.append(self.embeddings.word_to_index[lemma])
+
+                    #Glove, POS, Word_freq, lemmatized wordindex
                     matrix[i] = vector
 
             list_of_matrices.append(matrix)
@@ -160,7 +175,7 @@ class Embedder:
                     named_entities[entity_name]=entity_type
         return named_entities
 
-    def term_frequency(self,words):
+    def word_frequency(self,words):
         word_counts = {}
         for word in words:
             if(word in word_counts.keys()):
@@ -213,6 +228,4 @@ class Embedder:
 
 e = Embedder(None)
 q = 'You could, of course, write your own depth first search'
-ner = e.NER(q)
-print(type(ner))
-print(ner)
+e.tokenize(q)
