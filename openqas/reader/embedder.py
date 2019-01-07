@@ -13,9 +13,7 @@ from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 import pandas as pd
 import string
-import sys
-sys.path.append("..")
-from utils.data import WordEmbeddings
+from ..utils.data import WordEmbeddings
 
 STOPWORDS = {
     'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your',
@@ -225,7 +223,3 @@ class Embedder:
             #yield lemma.lemmatize(word_token) #returns a generator , can only iterate through thhis once
             lemma_list.append(lemma.lemmatize(word_token))
         return lemma_list
-
-e = Embedder(None)
-q = 'You could, of course, write your own depth first search'
-e.tokenize(q)
