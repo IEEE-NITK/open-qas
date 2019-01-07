@@ -1,2 +1,4 @@
 .ipynb_checkpoints
 .vscode
+glove.6B.100d.txt
+__pycache__
