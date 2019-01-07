@@ -2,15 +2,18 @@ import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import wordnet
 from nltk import pos_tag, ne_chunk
+from nltk.stem.snowball import SnowballStemmer
+from nltk.stem import WordNetLemmatizer
 from nltk.data import load
 
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
+from sklearn.preprocessing import OneHotEncoder
 
 import numpy as np
 import pandas as pd
-
-from ..utils.data import WordEmbeddings
+import string
+#from ..utils.data import WordEmbeddings
 
 STOPWORDS = {
     'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your',
@@ -39,9 +42,11 @@ POSTAGS = {'$': 0, "''": 1, '(': 2, ')': 3, ',': 4, '--': 5, '.': 6, ':': 7, 'CC
  'UH': 33, 'VB': 34, 'VBD': 35, 'VBG': 36, 'VBN': 37, 'VBP': 38, 'VBZ': 39, 'WDT': 40, 
  'WP': 41, 'WP$': 42, 'WRB': 43, '``': 44}
 
+# { Part-of-speech constants
+ADJ, ADJ_SAT, ADV, NOUN, VERB = 'a', 's', 'r', 'n', 'v'
+# }
 
 class Embedder:
-    
     def __init__(self, word_embeddings, seq_length=1000, stopwords='default'):
         """
         Initialises the embedder class.
@@ -107,7 +112,7 @@ class Embedder:
         Use doc_tokens to get the features meha made
         Make one hot vectors out of all of them and append to vector
         """
-
+        
         meha = 0
         seq_len = self.MAX_SEQUENCE_LENGTHS
         emb_dim = self.embeddings.EMBEDDING_DIM
@@ -128,3 +133,86 @@ class Embedder:
         
         list_of_matrices = np.array(list_of_matrices)
         return list_of_matrices
+
+    def GetPOSTags(self, text):
+        text = word_tokenize(text)
+        return pos_tag(text)
+
+    def OneHotEncode(self, tag_dict, tag):
+        one_hot = np.zeros((len(tag_dict), ))
+        one_hot[tag_dict[tag]] = 1
+
+        return one_hot
+
+    def NER(self, doc):
+        #pos = self.GetPOST(text)
+        #return ne_chunk(pos)
+        tagged_s = self.GetPOSTags(doc)
+        chunked_s = nltk.ne_chunk(tagged_s)
+        named_entities={}
+
+        for tree in chunked_s:
+            print(tree)
+            if hasattr(tree,'label'):
+                entity_name = ' '.join(c[0] for c in tree.leaves())
+                entity_type = tree.label()
+                if entity_name not in named_entities.keys():
+                    named_entities[entity_name]=entity_type
+        return named_entities
+
+    def term_frequency(self,words):
+        word_counts = {}
+        for word in words:
+            if(word in word_counts.keys()):
+                word_counts[word] += 1
+            else:
+                word_counts[word] = 1
+        for key,value in word_counts.items():
+            word_counts[key]= value / len(words)
+
+        return word_counts
+    
+    def get_word_synonyms_from_sent(self, word, sent):
+        word_synonyms = []
+        for synset in wordnet.synsets(word):
+            for lemma in synset.lemma_names():
+                if lemma in sent and lemma != word:
+                    word_synonyms.append(lemma)
+
+        return word_synonyms
+
+    def exact_match(self, word,question):
+        ans = []
+        synonym = self.get_word_synonyms_from_sent(word,question) 
+        if(word in question): #exact
+            ans.append(1)
+        else:
+            ans.append(0)
+        if word.lower() in question: #lower
+            ans.append(1)
+        else:
+            ans.append(0)
+
+        if(len(synonym) > 0): #lemma
+            ans.append(1)
+        else:
+            ans.append(0)
+        
+        return ans
+    def Lemmatize(self, text):
+        lemma = WordNetLemmatizer()
+        text = text.lower()
+        lemma_list = []
+
+        for word_token in word_tokenize(text):
+            if word_token in string.punctuation:
+                pass
+            #yield lemma.lemmatize(word_token) #returns a generator , can only iterate through thhis once
+            lemma_list.append(lemma.lemmatize(word_token))
+        return lemma_list
+
+e = Embedder(None)
+q = 'You could, of course, write your own depth first search'
+ner = e.NER(q)
+print(type(ner))
+print(ner)
