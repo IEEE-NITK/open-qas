@@ -58,10 +58,6 @@ t3 = nltk.TrigramTagger(train, backoff = t2 )
 
 class Embedder:
     
-    #training pos_model
-    custom_model = CUSTOM_POS_MODEL()
-    custom_model.train_pos()
-    
     def __init__(self, word_embeddings, seq_length=1000, stopwords='default'):
         """
         Initialises the embedder class.
