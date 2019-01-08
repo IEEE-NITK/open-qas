@@ -1,6 +1,6 @@
 import nltk
 from nltk.tokenize import word_tokenize
-from nltk.corpus import wordnet
+from nltk.corpus import wordnet, brown
 from nltk import pos_tag, ne_chunk
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem import WordNetLemmatizer
@@ -14,6 +14,8 @@ import numpy as np
 import pandas as pd
 import string
 from ..utils.data import WordEmbeddings
+
+
 
 STOPWORDS = {
     'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your',
@@ -46,7 +48,20 @@ POSTAGS = {'$': 0, "''": 1, '(': 2, ')': 3, ',': 4, '--': 5, '.': 6, ':': 7, 'CC
 ADJ, ADJ_SAT, ADV, NOUN, VERB = 'a', 's', 'r', 'n', 'v'
 # }
 
+
+
+train = brown.tagged_sents()
+t0 = nltk.DefaultTagger('NN')
+t1 = nltk.UnigramTagger(train,backoff=t0)
+t2 = nltk.BigramTagger(train, backoff = t1)
+t3 = nltk.TrigramTagger(train, backoff = t2 )
+
 class Embedder:
+    
+    #training pos_model
+    custom_model = CUSTOM_POS_MODEL()
+    custom_model.train_pos()
+    
     def __init__(self, word_embeddings, seq_length=1000, stopwords='default'):
         """
         Initialises the embedder class.
@@ -147,9 +162,10 @@ class Embedder:
         list_of_matrices = np.array(list_of_matrices)
         return list_of_matrices
 
-    def GetPOSTags(self, text):
-        text = word_tokenize(text)
-        return pos_tag(text)
+    def GetPOSTags(self,sentence):
+        sent_tokenize = nltk.word_tokenize(sentence)
+        output = t3.tag(sent_tokenize)
+        return output
 
     def OneHotEncode(self, tag_dict, tag):
         one_hot = np.zeros((len(tag_dict), ))
