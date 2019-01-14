@@ -42,6 +42,9 @@ POSTAGS = {'$': 0, "''": 1, '(': 2, ')': 3, ',': 4, '--': 5, '.': 6, ':': 7, 'CC
  'UH': 33, 'VB': 34, 'VBD': 35, 'VBG': 36, 'VBN': 37, 'VBP': 38, 'VBZ': 39, 'WDT': 40, 
  'WP': 41, 'WP$': 42, 'WRB': 43, '``': 44}
 
+NERTAGS = {'FACILITY':0,'GPE':1,'GSP':2,'LOCATION':3,'ORGANIZATION':4,'PERSON':5, 'OTHER': 6}
+#GPE is Geo-Political Entity, GSP is Geo-Socio-Political group
+
 # { Part-of-speech constants
 ADJ, ADJ_SAT, ADV, NOUN, VERB = 'a', 's', 'r', 'n', 'v'
 # }
@@ -95,6 +98,7 @@ class Embedder:
             tokens.append(filtered_tokens)
 
         sequences = pad_sequences(sequences, maxlen=self.MAX_SEQUENCE_LENGTHS)
+        
         return tokens, sequences
 
     def get_embeddings(self, docs):
@@ -113,33 +117,55 @@ class Embedder:
         Make one hot vectors out of all of them and append to vector
         """
         
-        meha = 0
+        meha = len(POSTAGS) + len(NERTAGS) + 1 + 1 #freq + lemma
         seq_len = self.MAX_SEQUENCE_LENGTHS
         emb_dim = self.embeddings.EMBEDDING_DIM
 
         for sequence in sequences:
-            matrix = np.zeros((seq_len, emb_dim + meha))
-            print(sequence)
-            sentence = [sequence[j] for j in range(0,seq_len)]
-            freqs = self.word_frequency(sentence)
+            matrix = np.zeros((seq_len, emb_dim + meha))            
+            
+            sentence = []
+            for j in range(0,seq_len):
+                if sequence[j] != 0:
+                    sentence.append(self.embeddings.index_to_word[sequence[j]])
+            
+            sentence = ' '.join(str(i) for i in sentence) #convert all words to one string
+            freqs = self.word_frequency(sentence) #word_freqs (dict)
+            pos_tags = self.GetPOSTags(sentence) #(list of tuples)
+            ner_tags = self.NER(sentence) #dict containing tags
+            word_lemmas = self.Lemmatize(sentence) #list containing lemmas
+            
+            tag_index =  0 #index for the getting tag of currentn word
 
             for i in range(0, seq_len):
                 index = sequence[i]
                 if index != 0:
                     word = self.embeddings.index_to_word[index]
                     vector = self.embeddings.word_to_vec[word]
-                    ### Feautures ###
-                    pos = self.OneHotEncode(POSTAGS, self.GetPOSTags(word)[1])
-                    word_freq = freqs[i]
-                    lemma = self.Lemmatize(word)
+            
+                    ### Features ###
+            
+                    pos =  self.OneHotEncode(POSTAGS, pos_tags[tag_index][1]) #tuple (word, tag)
+                    word_freq = freqs[word]
+                    ner = None
+                    if word not in ner_tags:
+                        ner = self.OneHotEncode(NERTAGS, 'OTHER')                     
+                    else:
+                        ner = self.OneHotEncode(NERTAGS, ner_tags[word])
+                    
+                    lemma = self.embeddings.word_to_index[word_lemmas[tag_index]]
+
                     """
                     APPEND FEATURES TO VECTOR HERE
                     """
-                    vector.append(pos)
-                    vector.append(word_freq)
-                    vector.append(self.embeddings.word_to_index[lemma])
 
-                    #Glove, POS, Word_freq, lemmatized wordindex
+                    vector = np.concatenate((vector, pos))
+                    vector = np.concatenate((vector, ner))
+                    vector = np.concatenate((vector, np.array([word_freq])))
+                    vector = np.concatenate((vector, np.array([lemma])))
+                    
+                    tag_index += 1
+                    
                     matrix[i] = vector
 
             list_of_matrices.append(matrix)
@@ -158,23 +184,32 @@ class Embedder:
         return one_hot
 
     def NER(self, doc):
-        #pos = self.GetPOST(text)
-        #return ne_chunk(pos)
-        tagged_s = self.GetPOSTags(doc)
-        chunked_s = nltk.ne_chunk(tagged_s)
-        named_entities={}
+        #tagged_s = self.GetPOSTags(doc)
+        #chunked = nltk.ne_chunk(tagged_s)
+        #continuous_chunk = []
+        #current_chunk = []
+        #for i in chunked:
+        #    if type(i) == nltk.tree.Tree:
+        #        current_chunk.append(" ".join([token for token, pos in i.leaves()]))
+        #    elif current_chunk:
+        #        named_entity = " ".join(current_chunk)
+        #        if named_entity not in continuous_chunk:
+        #                continuous_chunk.append(named_entity)
+        #                current_chunk = []
+        #    else:
+        #        continue
+        #print(continuous_chunk)
+        ner_tags = {}
+        for sent in nltk.sent_tokenize(doc):
+            for chunk in nltk.ne_chunk(self.GetPOSTags(sent)):
+                if hasattr(chunk, 'label'):
+                    word = (' '.join(c[0] for c in chunk))
+                    ner_tags[word] = chunk.label()
+        return ner_tags
 
-        for tree in chunked_s:
-            print(tree)
-            if hasattr(tree,'label'):
-                entity_name = ' '.join(c[0] for c in tree.leaves())
-                entity_type = tree.label()
-                if entity_name not in named_entities.keys():
-                    named_entities[entity_name]=entity_type
-        return named_entities
-
-    def word_frequency(self,words):
+    def word_frequency(self,sentence):
         word_counts = {}
+        words = sentence.split()
         for word in words:
             if(word in word_counts.keys()):
                 word_counts[word] += 1
