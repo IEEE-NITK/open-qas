@@ -4,3 +4,4 @@ glove.6B.100d.txt
 __pycache__
 client_secrets.json
 bigquery_credentials.dat
+wiki_*
