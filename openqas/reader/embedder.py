@@ -53,13 +53,6 @@ ADJ, ADJ_SAT, ADV, NOUN, VERB = 'a', 's', 'r', 'n', 'v'
 # }
 
 
-
-train = brown.tagged_sents()
-t0 = nltk.DefaultTagger('NN')
-t1 = nltk.UnigramTagger(train,backoff=t0)
-t2 = nltk.BigramTagger(train, backoff = t1)
-t3 = nltk.TrigramTagger(train, backoff = t2 )
-
 class Embedder:
     
     def __init__(self, word_embeddings, seq_length=1000, stopwords='default'):
