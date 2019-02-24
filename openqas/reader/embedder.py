@@ -13,7 +13,7 @@ from sklearn.preprocessing import OneHotEncoder
 import numpy as np
 import pandas as pd
 import string
-from ..utils.data import WordEmbeddings
+from data import WordEmbeddings
 
 STOPWORDS = {
     'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your',
