@@ -178,10 +178,9 @@ class Embedder:
         list_of_matrices = np.array(list_of_matrices)
         return list_of_matrices
 
-#     def GetPOSTags(self,sentence):
-#         sent_tokenize = nltk.word_tokenize(sentence)
-#         output = t3.tag(sent_tokenize)
-#         return output
+#     def GetPOSTags(self, text):
+#         text = word_tokenize(text)
+#         return pos_tag(text)
 
     def GetPOSTags(self,sentence):
         st = StanfordPOSTagger('english-bidirectional-distsim.tagger','stanford-postagger.jar')
