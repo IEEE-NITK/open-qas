@@ -81,15 +81,14 @@ class Retriever:
 class WikiRetriever:
     """
     Wrapper class for the actual Retriever.
-    Made for the scam JSON files we're using as our _dataset_
-    Modifications required before use with the actual dataset
+    Expects a WikiRetriever style JSON as input. 
     Pretty prints titles along with their scores.
     """
 
     def __init__(self, path):
         """
         Initialises the WikiRetriever.
-        Expects the path to the scam JSON file as input.
+        Expects the path to the JSON file as input.
         """
         self.path = path
 
