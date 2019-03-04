@@ -7,6 +7,10 @@ import prettytable
 import code
 import argparse
 import os.path
+import pickle
+import openqas.utils.db
+from openqas.utils.db import WikiDB
+
 
 # Array of stopwords that I gracefully borrowed from the DrQA implementation
 STOPWORDS = {
@@ -50,6 +54,7 @@ class Retriever:
         """
         h_doc_counts = self.h_vectorizer.transform(docs)
         self.tfidf_matrix = self.transformer.fit_transform(h_doc_counts)
+    
 
     def find_best_doc_indices(self, query, k, return_scores=False):
         """
@@ -93,9 +98,23 @@ class WikiRetriever:
         self.path = path
 
         # Load the JSON. Docs are stored in a Pandas Dataframe
-        self.wikidocs = pd.read_json(path, lines=True)
-        assert self.wikidocs is not None
+        # self.wikidocs = pd.read_json(path, lines=True)
+        # assert self.wikidocs is not None
+
+        self.wiki = WikiDB(path)
         self.retriever = None
+
+    def load_docs(self):
+        self.doc_ids = self.wiki.get_all_doc_ids()
+        self.wikidocs = self.wiki.get_all_doc_texts()
+
+    def save(self, path):
+        with open(path, "wb") as fout:
+            pickle.dump(self.retriever, fout)
+    
+    def load(self, path):
+        with open(path, "rb") as fin:
+            self.retriever = pickle.load(fin)
 
     def fit(self, ngrams=2):
         """
@@ -103,7 +122,8 @@ class WikiRetriever:
         Returns nothing. 
         """
         self.retriever = Retriever(ngrams)
-        self.retriever.build_tfidf(self.wikidocs.text)
+        self.retriever.build_tfidf(self.wikidocs)
+        self.wikidocs = None
 
     def find_best_docs(self, query, k=10):
         """
@@ -112,45 +132,8 @@ class WikiRetriever:
         """
 
         best_docs_indices, best_docs_scores = self.retriever.find_best_doc_indices(query, k, return_scores=True)
-        return best_docs_indices, self.wikidocs.title[best_docs_indices], best_docs_scores
+        # return best_docs_indices, self.wikidocs.title[best_docs_indices], best_docs_scores
+        best_docs_ids = self.doc_ids[best_docs_indices]
+        best_docs_titles = [self.wiki.get_doc_title(id) for id in best_docs_ids]
 
-def main():
-    """
-    This main function creates an interactive shell for the retriever.
-    Heavily inspired by the DrQA implementation.
-    """
-    parser = argparse.ArgumentParser()
-    parser.add_argument("path", type=str, help="path to scam JSON holding Wiki data")
-    args = parser.parse_args()
-
-    assert os.path.isfile(args.path)
-    ranker = WikiRetriever(args.path)
-    ranker.fit()
-
-    def where_is(query, k=10):
-        doc_indices, doc_titles, doc_scores = ranker.find_best_docs([query], k)
-        ptable = prettytable.PrettyTable(
-            ['Rank', 'Document', 'Score']
-        )
-        for i in range(len(doc_indices)):
-            ptable.add_row([i+1, doc_titles[doc_indices[i]], '%.5g' % doc_scores[i]])
-        
-        print(ptable)
-
-    banner = """
-    Interactive Wiki Retriever
-    >>> where_is(question, k=10)
-    >>> pls()
-    """
-
-    exitmsg = """
-    Exiting Interactive Wiki Retriever
-    """
-
-    def pls():
-        print(banner)
-    
-    code.interact(banner=banner, local=locals(), exitmsg=exitmsg)
-
-if __name__ == "__main__":
-    main()
+        return best_docs_ids, best_docs_titles, best_docs_scores

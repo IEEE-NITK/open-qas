@@ -1,5 +1,5 @@
 import tensorflow as tf 
-from reader import Reader
+from openqas.reader.reader import Reader
 from numpy import  newaxis
 from keras.layers import LSTM, Input, Bidirectional
 import numpy as np
@@ -51,7 +51,7 @@ with tf.Session() as sess:
         print(sess.run(end_pos))
 
 
-''' Training the model ''''
+''' Training the model '''
 '''
 model = Model(input=[context_input, question_input], output=[answerPtrBegin_output, answerPtrEnd_output])
 rms = optimizers.RMSprop(lr=0.0005)
