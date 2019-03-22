@@ -29,7 +29,7 @@ def main():
     def where_is(query, k=10):
         doc_ids, doc_titles, doc_scores = ranker.find_best_docs([query], k)
         ptable = prettytable.PrettyTable(
-            ['Rank', 'Doc ID' 'Document', 'Score']
+            ['Rank', 'Doc ID', 'Document', 'Score']
         )
         for i in range(len(doc_ids)):
             ptable.add_row([i+1, doc_ids[i], doc_titles[i], '%.5g' % doc_scores[i]])

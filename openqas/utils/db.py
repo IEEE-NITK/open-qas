@@ -9,7 +9,7 @@ class WikiDB:
     
     def get_all_doc_ids(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT id FROM wiki")
+        cursor.execute("SELECT id FROM documents")
         results = [r[0] for r in cursor.fetchall()]
         cursor.close()
         return results
@@ -20,7 +20,7 @@ class WikiDB:
     def get_doc_text(self, id):
         cursor = self.connection.cursor()
         id = (id, )
-        cursor.execute("SELECT text FROM wiki WHERE id = ?", id)
+        cursor.execute("SELECT text FROM documents WHERE id = ?", id)
         result = cursor.fetchone()
         cursor.close()
         return result
@@ -28,14 +28,14 @@ class WikiDB:
     def get_doc_title(self, id):
         cursor = self.connection.cursor()
         id = (id, )
-        cursor.execute("SELECT title FROM wiki WHERE id = ?", id)
+        cursor.execute("SELECT title FROM documents WHERE id = ?", id)
         result = cursor.fetchone()
         cursor.close()
         return result
 
     def get_all_doc_texts(self):
         cursor = self.connection.cursor()
-        cursor.execute("SELECT text FROM wiki")
-        result = cursor.fetchall()
+        cursor.execute("SELECT text FROM documents")
+        result = [r[0] for r in cursor.fetchall()]
         cursor.close()
         return result

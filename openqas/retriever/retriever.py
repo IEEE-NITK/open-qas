@@ -110,8 +110,8 @@ class WikiRetriever:
 
     def save(self, path):
         with open(path, "wb") as fout:
-            pickle.dump(self.retriever, fout)
-    
+            pickle.dump(self.retriever, fout, protocol=4)
+
     def load(self, path):
         with open(path, "rb") as fin:
             self.retriever = pickle.load(fin)
