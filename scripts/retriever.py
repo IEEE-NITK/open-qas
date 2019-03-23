@@ -5,6 +5,8 @@ import argparse
 from openqas.retriever.retriever import WikiRetriever
 import prettytable
 import code
+from deeppavlov import build_model, configs
+model = build_model(configs.squad.squad, download=True)
 
 def main():
     """
@@ -31,7 +33,7 @@ def main():
         ranker.save(args.path + '.tfidf.pkl')
 
     def where_is(query, k=10):
-        doc_ids, doc_titles, doc_scores = ranker.find_best_docs([query], k)
+        doc_ids, doc_titles, doc_scores,docs = ranker.find_best_docs([query], k, return_docs=True)
         ptable = prettytable.PrettyTable(
             ['Rank', 'Doc ID', 'Title', 'Score']
         )
@@ -39,6 +41,18 @@ def main():
             ptable.add_row([i+1, doc_ids[i], doc_titles[i], '%.5g' % doc_scores[i]])
 
         print(ptable)
+
+        answer = docs[0]
+        score = -1
+        print(docs)
+        for context in docs:
+            answer_array = model([context],[quest])
+            ans_score =  answer_array[2][0]
+            if(ans_score > score ):
+                answer = answer_array[0][0]
+                score = ans_score
+
+        print(answer)
 
     banner = """
     Interactive Wiki Retriever

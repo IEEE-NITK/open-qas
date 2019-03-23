@@ -34,7 +34,6 @@ def question():
     if (request.method == 'POST'):
         quest = request.form['quest']
         #Put the context string in this
-
         doc_ids, doc_titles, doc_scores, docs = ranker.find_best_docs([quest], k=10, return_docs=True)
 
         context = docs
