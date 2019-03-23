@@ -55,7 +55,7 @@ def main():
         answers = answers[answers[:, 2].argsort()]
 
         atable = prettytable.PrettyTable(
-            ['Rank', 'Answer', 'Article Title', 'Score']
+            ['Answer', 'Article Title', 'Score']
         )
 
         for i in range(answers.shape[0]):
