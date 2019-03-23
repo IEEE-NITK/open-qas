@@ -12,8 +12,11 @@ model = build_model(configs.squad.squad, download=True)
 wiki_path = "/mnt/data/wiki.db"
 tfidf_path = "/mnt/data/wiki.db.tfidf.pkl"
 
+print("Initialising Retriever")
 ranker = WikiRetriever(wiki_path)
+print("Loading IDs")
 ranker.load_ids()
+print("Loading TFIDF")
 ranker.load(tfidf_path)
 
 # App config.
