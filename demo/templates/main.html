@@ -1,0 +1,60 @@
+<html>
+     
+    <title>Question Answering Demo</title>
+
+    <link rel="stylesheet" media="screen" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<body>
+    <div class="container">
+        <h2>Enter your question here </h2>
+        <form action="" method="post" role="form">
+            {{ form.csrf }}
+        <div class="form-group">
+            
+            <input type="text" class="form-control" id="name" name="quest" placeholder="Enter your question"></div>
+            <button type="submit" class="btn btn-success">Submit</button>
+        </form>{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+
+        {% for message in messages %}
+        {% if "Error" not in message[1]: %}
+        <div class="answer">
+            <h3>{{ message[1] }} </h3>
+        </div>
+        {% endif %}
+
+        {% if "Error" in message[1]: %}
+        <div class="alert alert-warning">
+        {{ message[1] }}</div>
+        {% endif %}
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+</div>
+</body>
+</html>
+<style>
+.container{
+    margin: auto;
+    margin-top: 8em;
+    width: 50%;
+    border: 3px solid whitesmoke;
+}
+body{
+    background-image: url(https://images.wallpaperscraft.com/image/laptop_room_on_the_desk_keyboard_mouse_apple_window_interior_73963_300x168.jpg);
+    background-size: cover;
+    background-attachment: fixed;
+    font: bold;
+    font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+.answer{
+    font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif;
+    color: white;
+    margin: 5px;
+
+}
+h2{
+    color: white;
+}
+</style>
