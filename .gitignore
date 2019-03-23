@@ -6,3 +6,4 @@ client_secrets.json
 bigquery_credentials.dat
 wiki_*
 wiki.db
+*.h5

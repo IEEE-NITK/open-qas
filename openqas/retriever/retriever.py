@@ -128,7 +128,7 @@ class WikiRetriever:
         self.retriever.build_tfidf(self.wikidocs)
         self.wikidocs = None
 
-    def find_best_docs(self, query, k=10):
+    def find_best_docs(self, query, k=10, return_docs=False):
         """
         Returns the titles and scores of the k closest docs 
         query must be a list of strings
@@ -138,5 +138,9 @@ class WikiRetriever:
         # return best_docs_indices, self.wikidocs.title[best_docs_indices], best_docs_scores
         best_docs_ids = [self.doc_ids[id] for id in best_docs_indices]
         best_docs_titles = [self.wiki.get_doc_title(id) for id in best_docs_ids]
+        best_docs = [self.wiki.get_doc_text(id) for id in best_docs_ids]
+
+        if return_docs:
+            return best_docs_ids, best_docs_titles, best_docs_scores, best_docs
 
         return best_docs_ids, best_docs_titles, best_docs_scores

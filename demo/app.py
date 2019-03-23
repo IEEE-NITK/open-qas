@@ -1,7 +1,20 @@
+import os, sys
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
+
+from openqas.retriever.retriever import WikiRetriever
+
 from flask import Flask, render_template, flash, request
 from wtforms import Form, TextField, TextAreaField, validators, StringField, SubmitField
 from deeppavlov import build_model, configs
+
 model = build_model(configs.squad.squad, download=True)
+
+wiki_path = "/mnt/data/wiki.db"
+tfidf_path = "/mnt/data/wiki.db.tfidf.pkl"
+
+ranker = WikiRetriever(wiki_path)
+ranker.load_ids()
+ranker.load(tfidf_path)
 
 # App config.
 DEBUG = True
@@ -18,7 +31,10 @@ def question():
     if (request.method == 'POST'):
         quest = request.form['quest']
         #Put the context string in this
-        context = ["Anumeha is a gt","Anumeha is very nice"]
+
+        doc_ids, doc_titles, doc_scores, docs = ranker.find_best_docs([quest], k=10, return_docs=True)
+
+        context = docs
         answer = context[1]
         score = -1
         for cont in context:
