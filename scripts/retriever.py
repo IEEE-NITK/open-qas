@@ -52,7 +52,8 @@ def main():
                 # answer = answer_array[0][0]
                 # score = ans_score
         answers = np.array(answers)
-        answers = answers[answers[:, 2].argsort()]
+        ind = np.argsort(answers[:, 2])[::-1]
+        answers = answers[ind]
 
         atable = prettytable.PrettyTable(
             ['Answer', 'Article Title', 'Score']
