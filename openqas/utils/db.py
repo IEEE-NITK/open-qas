@@ -23,7 +23,7 @@ class WikiDB:
         cursor.execute("SELECT text FROM documents WHERE id = ?", id)
         result = cursor.fetchone()
         cursor.close()
-        return result
+        return result[0]
 
     def get_doc_title(self, id):
         cursor = self.connection.cursor()
@@ -31,7 +31,7 @@ class WikiDB:
         cursor.execute("SELECT title FROM documents WHERE id = ?", id)
         result = cursor.fetchone()
         cursor.close()
-        return result
+        return result[0]
 
     def get_all_doc_texts(self):
         cursor = self.connection.cursor()

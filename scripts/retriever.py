@@ -20,20 +20,24 @@ def main():
     ranker = WikiRetriever(args.path)
 
     if(args.load is not None):
+        ranker.load_ids()
         ranker.load(args.load)
     else:
+        print("Loading Docs")
         ranker.load_docs()
+        print("Starting TFIDF calcaulation")
         ranker.fit()
+        print("Saving matrix")
         ranker.save(args.path + '.tfidf.pkl')
 
     def where_is(query, k=10):
         doc_ids, doc_titles, doc_scores = ranker.find_best_docs([query], k)
         ptable = prettytable.PrettyTable(
-            ['Rank', 'Doc ID', 'Document', 'Score']
+            ['Rank', 'Doc ID', 'Title', 'Score']
         )
         for i in range(len(doc_ids)):
             ptable.add_row([i+1, doc_ids[i], doc_titles[i], '%.5g' % doc_scores[i]])
-        
+
         print(ptable)
 
     banner = """
@@ -48,7 +52,6 @@ def main():
 
     def pls():
         print(banner)
-    
     code.interact(banner=banner, local=locals(), exitmsg=exitmsg)
 
 if __name__ == "__main__":

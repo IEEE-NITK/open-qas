@@ -108,6 +108,9 @@ class WikiRetriever:
         self.doc_ids = self.wiki.get_all_doc_ids()
         self.wikidocs = self.wiki.get_all_doc_texts()
 
+    def load_ids(self):
+        self.doc_ids = self.wiki.get_all_doc_ids()
+
     def save(self, path):
         with open(path, "wb") as fout:
             pickle.dump(self.retriever, fout, protocol=4)
@@ -130,10 +133,10 @@ class WikiRetriever:
         Returns the titles and scores of the k closest docs 
         query must be a list of strings
         """
-
+        #print(self.doc_ids[0:10])
         best_docs_indices, best_docs_scores = self.retriever.find_best_doc_indices(query, k, return_scores=True)
         # return best_docs_indices, self.wikidocs.title[best_docs_indices], best_docs_scores
-        best_docs_ids = self.doc_ids[best_docs_indices]
+        best_docs_ids = [self.doc_ids[id] for id in best_docs_indices]
         best_docs_titles = [self.wiki.get_doc_title(id) for id in best_docs_ids]
 
         return best_docs_ids, best_docs_titles, best_docs_scores
