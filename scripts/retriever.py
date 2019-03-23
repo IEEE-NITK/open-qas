@@ -32,8 +32,8 @@ def main():
         print("Saving matrix")
         ranker.save(args.path + '.tfidf.pkl')
 
-    def where_is(query, k=10):
-        doc_ids, doc_titles, doc_scores,docs = ranker.find_best_docs([query], k, return_docs=True)
+    def answer(query, k=10):
+        doc_ids, doc_titles, doc_scores, docs = ranker.find_best_docs([query], k, return_docs=True)
         ptable = prettytable.PrettyTable(
             ['Rank', 'Doc ID', 'Title', 'Score']
         )
@@ -46,7 +46,7 @@ def main():
         score = -1
         print(docs)
         for context in docs:
-            answer_array = model([context],[quest])
+            answer_array = model([context],[query])
             ans_score =  answer_array[2][0]
             if(ans_score > score ):
                 answer = answer_array[0][0]
@@ -56,7 +56,7 @@ def main():
 
     banner = """
     Interactive Wiki Retriever
-    >>> where_is(question, k=10)
+    >>> answer(question, k=10)
     >>> pls()
     """
 
