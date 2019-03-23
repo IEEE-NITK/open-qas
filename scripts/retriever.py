@@ -5,6 +5,7 @@ import argparse
 from openqas.retriever.retriever import WikiRetriever
 import prettytable
 import code
+import numpy as np
 from deeppavlov import build_model, configs
 model = build_model(configs.squad.squad, download=True)
 
@@ -42,17 +43,27 @@ def main():
 
         print(ptable)
 
-        answer = docs[0]
-        score = -1
-        print(docs)
-        for context in docs:
-            answer_array = model([context],[query])
-            ans_score =  answer_array[2][0]
-            if(ans_score > score ):
-                answer = answer_array[0][0]
-                score = ans_score
+        answers = []
+        for i in range(len(docs)):
+            answer_array = model([docs[i]],[query])
+            # ans_score =  answer_array[2][0]
+            answers.append([answer_array[0][0], doc_titles[i], answer_array[2][0]])
+            # if(ans_score > score ):
+                # answer = answer_array[0][0]
+                # score = ans_score
+        answers = np.array(answers)
+        answers = answers[answers[:, 2].argsort()]
 
-        print(answer)
+        atable = prettytable.PrettyTable(
+            ['Rank', 'Answer', 'Article Title', 'Score']
+        )
+
+        for i in range(answers.shape[0]):
+            atable.add_row(answers[i])
+        
+        print(atable)
+
+        # print(answer)
 
     banner = """
     Interactive Wiki Retriever
