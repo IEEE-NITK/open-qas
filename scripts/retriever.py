@@ -41,7 +41,7 @@ def main():
             ptable.add_row([i+1, doc_ids[i], doc_titles[i], '%.5g' % doc_scores[i]])
 
         print(ptable)
-
+        
         answer = docs[0]
         score = -1
         print(docs)
