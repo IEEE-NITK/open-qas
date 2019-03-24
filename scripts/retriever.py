@@ -5,6 +5,7 @@ import argparse
 from openqas.retriever.retriever import WikiRetriever
 import prettytable
 import code
+import numpy as np
 from deeppavlov import build_model, configs
 model = build_model(configs.squad.squad, download=True)
 
@@ -32,8 +33,8 @@ def main():
         print("Saving matrix")
         ranker.save(args.path + '.tfidf.pkl')
 
-    def where_is(query, k=10):
-        doc_ids, doc_titles, doc_scores,docs = ranker.find_best_docs([query], k, return_docs=True)
+    def answer(query, k=10):
+        doc_ids, doc_titles, doc_scores, docs = ranker.find_best_docs([query], k, return_docs=True)
         ptable = prettytable.PrettyTable(
             ['Rank', 'Doc ID', 'Title', 'Score']
         )
@@ -41,22 +42,33 @@ def main():
             ptable.add_row([i+1, doc_ids[i], doc_titles[i], '%.5g' % doc_scores[i]])
 
         print(ptable)
-        
-        answer = docs[0]
-        score = -1
-        print(docs)
-        for context in docs:
-            answer_array = model([context],[quest])
-            ans_score =  answer_array[2][0]
-            if(ans_score > score ):
-                answer = answer_array[0][0]
-                score = ans_score
 
-        print(answer)
+        answers = []
+        for i in range(len(docs)):
+            answer_array = model([docs[i]],[query])
+            # ans_score =  answer_array[2][0]
+            answers.append([answer_array[0][0], doc_titles[i], answer_array[2][0]])
+            # if(ans_score > score ):
+                # answer = answer_array[0][0]
+                # score = ans_score
+        answers = np.array(answers)
+        ind = np.argsort(answers[:, 2])[::-1]
+        answers = answers[ind]
+
+        atable = prettytable.PrettyTable(
+            ['Answer', 'Article Title', 'Score']
+        )
+
+        for i in range(answers.shape[0]):
+            atable.add_row(answers[i])
+        
+        print(atable)
+
+        # print(answer)
 
     banner = """
     Interactive Wiki Retriever
-    >>> where_is(question, k=10)
+    >>> answer(question, k=10)
     >>> pls()
     """
 
