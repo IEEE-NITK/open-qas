@@ -5,6 +5,9 @@ from nltk import pos_tag, ne_chunk
 from nltk.stem.snowball import SnowballStemmer
 from nltk.stem import WordNetLemmatizer
 from nltk.data import load
+from  nltk.tag import StanfordPOSTagger
+from nltk.tag import StanfordNERTagger
+
 
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
@@ -174,8 +177,11 @@ class Embedder:
         return list_of_matrices
 
     def GetPOSTags(self, text):
-        text = word_tokenize(text)
-        return pos_tag(text)
+#         text = word_tokenize(text)
+#         return pos_tag(text)
+          st = StanfordPOSTagger('english-bidirectional-distsim.tagger','stanford-postagger.jar')
+          output = st.tag(text.split())
+          return output
 
     def OneHotEncode(self, tag_dict, tag):
         one_hot = np.zeros((len(tag_dict), ))
